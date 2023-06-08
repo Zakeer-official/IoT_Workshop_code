@@ -13,10 +13,8 @@ grovepi.pinMode(button,"INPUT")
 def thingspeak_post(energy):
     threading.Timer(15,thingspeak_post).start()
     URL =  "https://api.thingspeak.com/update?api_key=ZKBFV2VIVUI9B8LP"
-    #HEADER  = "&field1={}&field2={}".format(temp,door_status)
     HEADER  = "&field1={}".format(energy)
     NEW_URL = URL + HEADER
-    print(NEW_URL)
     data = urllib.request.urlopen(NEW_URL)
     print(data)
 
@@ -28,11 +26,11 @@ def read_energy():
     while time.time() < start_time + 5:
         if grovepi.digitalRead(button) == True:
             energy += 1
+    print("Units Consumed:",energy)
     return energy
 
-# Main loop to continuously regulate the temperature and check the door status
 while True:
     energy = read_energy()
     thingspeak_post(energy)
-    time.sleep(1)
+    time.sleep(10)
 

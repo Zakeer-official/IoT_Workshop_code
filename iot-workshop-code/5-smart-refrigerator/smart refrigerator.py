@@ -11,33 +11,31 @@ temp_humidity_sensor = 4     #Temperature sensor Port Number
 therm_version = 0  # blue version
 door_sensor = 3
 grovepi.pinMode(door_sensor,"INPUT")
-print("1")
+grovepi.pinMode(temp_humidity_sensor,"INPUT")
 # Set the threshold for the temperature
-TEMPERATURE_THRESHOLD = 20
+TEMPERATURE_THRESHOLD = 4 #Celsius
 
 def thingspeak_post():
     threading.Timer(15,thingspeak_post).start()
     temp=round(get_temperature(),2)
     door_status = grovepi.digitalRead(door_sensor)
     URL =  "https://api.thingspeak.com/update?api_key=MT79B7HM6HZWZNKE"
-    #HEADER  = "&field1={}&field2={}".format(temp,door_status)
     HEADER  = "&field1={}".format(temp)
     NEW_URL = URL + HEADER
-    print("4")
-    print(NEW_URL)
     data = urllib.request.urlopen(NEW_URL)
     print(data)
 
 # Function to get the temperature from the sensor
 def get_temperature():
     [temp,humidity] = grovepi.dht(temp_humidity_sensor,therm_version)
-    print("3")
+    print("Temperature: ",temp,"C")
     return temp
 
 # Function to regulate the temperature of the refrigerator
 def regulate_temperature():
+    print("Checking temperature")
     temperature = get_temperature()
-    print("2")
+    print("Regulating temperature")
     if temperature > TEMPERATURE_THRESHOLD:
         # Code to decrease the temperature goes here
         print("Decreasing temperature...")
@@ -47,6 +45,9 @@ def regulate_temperature():
 
 # Main loop to continuously regulate the temperature and check the door status
 while True:
-    regulate_temperature()
-    thingspeak_post()
+    if grovepi.digitalRead(door_sensor) == 1:
+        regulate_temperature()
+        thingspeak_post()
     time.sleep(1)
+    
+

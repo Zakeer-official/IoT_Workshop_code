@@ -43,6 +43,7 @@ def execute_alarm(alarm_time):
             time.sleep(0.5)
             grovepi.digitalWrite(buzzer,0)
             time.sleep(0.5)
+    return "<h2>Alarm off!</h2>"
 
 
 if __name__ == "__main__":
